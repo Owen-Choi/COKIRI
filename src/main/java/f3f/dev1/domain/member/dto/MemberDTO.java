@@ -412,18 +412,6 @@ public class MemberDTO {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    @Getter
-    public static class SimpleLoginDto {
-
-        private String userId;
-
-        private TokenIssueDTO tokenInfo;
-
-    }
-
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
     @Data
     public static class GetUserPost {
         private Long postId;

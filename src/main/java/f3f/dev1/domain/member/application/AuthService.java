@@ -77,27 +77,6 @@ public class AuthService {
     }
 
     @Transactional
-    public SimpleLoginDto simpleLogin(LoginRequest loginRequest) {
-        // 1. 이메일, 비밀번호 기반으로 토큰 생성
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = loginRequest.toAuthentication();
-        // 2. 실제로 검증이 이뤄지는 부분,
-        // authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
-        Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(usernamePasswordAuthenticationToken);
-
-        // 3. 인증 정보를 기반으로 jwt 토큰 생성
-        TokenInfoDTO tokenInfoDTO = jwtTokenProvider.generateTokenDto(authenticate);
-        // 4. refesh token 저장
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set(authenticate.getName(), tokenInfoDTO.getRefreshToken());
-        redisTemplate.expire(authenticate.getName(), REFRESH_TOKEN_EXPIRE_TIME, TimeUnit.MILLISECONDS);
-
-        log.info("access : "+tokenInfoDTO.getAccessToken());
-
-        // 5. 토큰 발급
-        return SimpleLoginDto.builder().userId(authenticate.getName()).tokenInfo(tokenInfoDTO.toTokenIssueDTO()).build();
-    }
-
-    @Transactional
     public TokenIssueDTO reissue(AccessTokenDTO accessTokenDTO) {
         String accessToken = accessTokenDTO.getAccessToken();
 

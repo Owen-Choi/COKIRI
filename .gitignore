@@ -4,6 +4,7 @@ HELP.md
 build/
 lib/*
 /src/main/resources/application.yml
+/src/main/resources/key.yml
 
 ### IntelliJ IDEA ###
 .idea

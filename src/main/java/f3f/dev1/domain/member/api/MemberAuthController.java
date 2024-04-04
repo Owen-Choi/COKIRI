@@ -7,13 +7,15 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import f3f.dev1.domain.member.application.AuthService;
 import f3f.dev1.domain.member.application.EmailCertificationService;
 import f3f.dev1.domain.member.application.MemberService;
-import f3f.dev1.domain.member.application.OAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static f3f.dev1.domain.member.dto.MemberDTO.*;
-import static f3f.dev1.domain.member.dto.OAuthDTO.GoogleLoginRequest;
-import static f3f.dev1.domain.member.dto.OAuthDTO.GoogleTokenDto;
 import static f3f.dev1.domain.token.dto.TokenDTO.AccessTokenDTO;
 import static f3f.dev1.domain.token.dto.TokenDTO.TokenIssueDTO;
 
@@ -35,8 +35,6 @@ public class MemberAuthController {
     private final EmailCertificationService emailCertificationService;
 
     private final AuthService authService;
-
-    private final OAuth2UserService oAuth2UserService;
 
     private final AmazonS3Client amazonS3Client;
 
@@ -159,19 +157,11 @@ public class MemberAuthController {
     // 로그인 - TODO 크롬 자동 로그인 이용하려면 form data 형식도 열어놔야할듯
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserLoginDto> loginJson(@RequestBody LoginRequest loginRequest) {
-        log.info("로그인 호출됐음");
-        log.info("json 형식으로 데이터 넘어옴");
-        log.info("email " + loginRequest.getEmail());
-        log.info("pwd " + loginRequest.getPassword());
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<UserLoginDto> loginForm(LoginRequest loginRequest) {
-        log.info("로그인 호출됐음");
-        log.info("form 형식으로 데이터 넘어옴");
-        log.info("email " + loginRequest.getEmail());
-        log.info("pwd " + loginRequest.getPassword());
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
@@ -181,39 +171,6 @@ public class MemberAuthController {
     public ResponseEntity<String> loginRedirect() {
         return ResponseEntity.ok("LOGOUT");
     }
-
-    // 로그아웃은 스프링 시큐리티에서 기본적으로 제공해주는 기능사용
-
-
-    @PostMapping(value = "/auth/google_login")
-    public ResponseEntity<UserLoginDto> googleLogin(@RequestBody GoogleLoginRequest googleLoginRequest) {
-        return ResponseEntity.ok(oAuth2UserService.googleLogin(googleLoginRequest));
-    }
-
-    // 외부 API 로그인 요청
-    @PostMapping(value = "/auth/social_login/{loginType}")
-    public ResponseEntity<UserLoginDto> socialLogin(@PathVariable(name = "loginType") String loginType, @RequestBody GoogleTokenDto googleTokenDto) throws IOException {
-        log.debug("token " + googleTokenDto.getToken());
-
-        UserLoginDto userLoginDto = oAuth2UserService.oAuthLogin(loginType.toUpperCase(), googleTokenDto.getToken());
-
-        return ResponseEntity.ok(userLoginDto);
-
-    }
-
-    // 구글 로그인 콜백 처리
-//    @GetMapping(value = "/auth/social_login/{loginType}/callback")
-//    public ResponseEntity<UserLoginDto> callback(@PathVariable(name = "loginType") String loginType, @RequestParam(name = "code") String code) throws IOException {
-//        log.debug("code " + code);
-//        System.out.println("code = " + code);
-//
-//        UserLoginDto userLoginDto = oAuth2UserService.oAuthLogin(loginType.toUpperCase(), code);
-////        if (userLoginDto.getUserInfo().getNickname() == null) {
-////            return new ResponseEntity<>(userLoginDto, HttpStatus.CREATED);
-////        }
-//        return ResponseEntity.ok(userLoginDto);
-//    }
-
 
     // 재발급
     @PostMapping(value = "/auth/reissue")

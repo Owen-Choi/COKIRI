@@ -5,6 +5,7 @@ import f3f.dev1.domain.member.dto.MemberDTO.EmailConfirmCodeDto;
 import f3f.dev1.domain.member.exception.EmailCertificationExpireException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.MailException;
@@ -22,16 +23,15 @@ import static f3f.dev1.global.common.constants.EmailConstants.EMAIL_CERTIFICATIO
 import static javax.mail.Message.RecipientType.TO;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class EmailCertificationService {
 
     private final JavaMailSender emailSender;
-
-
     private final RedisTemplate<String, String> redisTemplate;
 
-    // 인증 번호
+    @Value("${email.username}")
+    private String username;
     private String ePw;
 
     public MimeMessage createMessage(String to) throws MessagingException, UnsupportedEncodingException {
@@ -40,23 +40,22 @@ public class EmailCertificationService {
         message.addRecipients(TO, to);
         message.setSubject("COKIRI 이메일 인증"); // 제목
 
-        // TODO StringBuffer를 이용해서 이어붙이는게 더 좋아보인다.
-
-        String msg = "";
-        msg += "<div style = 'margin:100px;'>";
-        msg += "<h1> 안녕하세요 </h1>";
-        msg += "<h1> 물물 교환 플랫폼 COKIRI 입니다.</h1>";
-        msg += "<br>";
-        msg += "<p>아래 코드를 앱으로 돌아가서 입력해주세요</p>";
-        msg += "<br>";
-        msg += "<div align='center' style = 'border:1px solid black; font-family:verdana';>";
-        msg += "<h3 style = 'color:blue;'>회원가입 인증 코드입니다.</h3>";
-        msg += "<div style='font-style:130%'>";
-        msg += "CODE: <strong>";
-        msg += ePw + "</strong><div><br/>";
-        msg += "</div>";
-        message.setText(msg, "utf-8", "html");
-        message.setFrom(new InternetAddress("cokiri_dev_team@naver.com", "COKIRI_admin"));
+        // 지역변수이기 때문에 StringBuilder를 활용하겠음
+        StringBuilder msg = new StringBuilder();
+        msg.append("<div style = 'margin:100px;'>");
+        msg.append("<h1> 안녕하세요 </h1>");
+        msg.append("<h1> 물물 교환 플랫폼 COKIRI 입니다.</h1>");
+        msg.append("<br>");
+        msg.append("<p>아래 코드를 앱으로 돌아가서 입력해주세요</p>");
+        msg.append("<br>");
+        msg.append("<div align='center' style = 'border:1px solid black; font-family:verdana';>");
+        msg.append("<h3 style = 'color:blue;'>회원가입 인증 코드입니다.</h3>");
+        msg.append("<div style='font-style:130%'>");
+        msg.append("CODE: <strong>");
+        msg.append(ePw).append("</strong><div><br/>");
+        msg.append("</div>");
+        message.setText(msg.toString(), "utf-8", "html");
+        message.setFrom(new InternetAddress(username + "@naver.com", "COKIRI_admin"));
         return message;
     }
 
