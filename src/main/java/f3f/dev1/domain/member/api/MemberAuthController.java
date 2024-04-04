@@ -41,6 +41,7 @@ public class MemberAuthController {
     private final AmazonS3Client amazonS3Client;
 
     // 이미지 유저 프로필 사진 업로드
+    // TODO authController에 있을 이유가 없다. memberController로 이동 예정
     @PostMapping(value = "/auth/image/profileImage")
     public ResponseEntity<ImageUrlDto> profileUpload(MultipartFile[] imageFiles) throws IOException {
         List<String> imagePathList = new ArrayList<>();
@@ -70,6 +71,7 @@ public class MemberAuthController {
     }
 
     // 게시글 이미지 업로드
+    // TODO authController에 있을 이유가 없다. postController로 이동 예정
     @PostMapping(value = "/auth/image/postImage")
     public ResponseEntity<ImageUrlDto> postUpload(MultipartFile[] imageFiles) throws IOException {
         List<String> imagePathList = new ArrayList<>();
@@ -151,9 +153,6 @@ public class MemberAuthController {
     // 회원가입
     @PostMapping(value = "/auth/signup")
     public ResponseEntity<String> signUp(@RequestBody SignUpRequest signUpRequest) {
-        // TODO: 회원가입할때 정보 검증을 프론트에서 할지 백에서할지 결정해야함
-
-
         return new ResponseEntity<>(authService.signUp(signUpRequest), HttpStatus.CREATED);
     }
 

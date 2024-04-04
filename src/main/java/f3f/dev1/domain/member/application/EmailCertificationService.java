@@ -40,6 +40,8 @@ public class EmailCertificationService {
         message.addRecipients(TO, to);
         message.setSubject("COKIRI 이메일 인증"); // 제목
 
+        // TODO StringBuffer를 이용해서 이어붙이는게 더 좋아보인다.
+
         String msg = "";
         msg += "<div style = 'margin:100px;'>";
         msg += "<h1> 안녕하세요 </h1>";
