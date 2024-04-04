@@ -1,16 +1,14 @@
 package f3f.dev1.global.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import f3f.dev1.domain.member.exception.NotAuthorizedException;
 import f3f.dev1.domain.token.exception.response.ExpireAccessTokenException;
 import f3f.dev1.global.error.ErrorResponse;
 import f3f.dev1.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -34,6 +32,9 @@ public class JwtFilter extends OncePerRequestFilter {
     private final RedisTemplate<String, String> redisTemplate;
 
     private final ObjectMapper mapper;
+
+    @Value("${origins.local}")
+    private String local;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -68,7 +69,8 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
             response.setStatus(response.SC_UNAUTHORIZED);
-            response.setHeader("Access-Control-Allow-Origin", "https://main.d8tw528p0jeqh.amplifyapp.com");
+//            response.setHeader("Access-Control-Allow-Origin", "https://main.d8tw528p0jeqh.amplifyapp.com");
+            response.setHeader("Access-Control-Allow-Origin", local);
             try {
                 response.getWriter().write(result);
             } catch (IOException exception) {
@@ -83,7 +85,8 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
             response.setStatus(response.SC_INTERNAL_SERVER_ERROR);
-            response.setHeader("Access-Control-Allow-Origin", "https://main.d8tw528p0jeqh.amplifyapp.com");
+//            response.setHeader("Access-Control-Allow-Origin", "https://main.d8tw528p0jeqh.amplifyapp.com");
+            response.setHeader("Access-Control-Allow-Origin", local);
             try {
                 response.getWriter().write(result);
             } catch (IOException exception) {
