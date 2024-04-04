@@ -35,6 +35,7 @@ import static f3f.dev1.global.common.constants.RandomCharacter.RandomCharacters;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberService {
     private final AddressRepository addressRepository;
 
@@ -50,18 +51,13 @@ public class MemberService {
 
     private final MessageRoomCustomRepositoryImpl messageRoomCustomRepositoryImpl;
 
-
-    @Transactional(readOnly = true)
     public RedunCheckDto existsByEmail(String email) {
         return new RedunCheckDto(memberRepository.existsByEmail(email));
     }
-
-    @Transactional(readOnly = true)
     public RedunCheckDto existsByNickname(String nickname) {
         return new RedunCheckDto(memberRepository.existsByNickname(nickname));
     }
 
-    @Transactional(readOnly = true)
     public RedunCheckDto existsByPhoneNumber(String phoneNumber) {
         return new RedunCheckDto(memberRepository.existsByPhoneNumber(phoneNumber));
     }
@@ -69,7 +65,6 @@ public class MemberService {
 
     // 조회 메소드
     // 아이디로 유저 정보 조회
-    @Transactional(readOnly = true)
     public UserInfoWithAddress getUserInfo(Long userId) {
         log.info("유저 정보 조회 호출됐음");
 
@@ -162,7 +157,6 @@ public class MemberService {
     }
 
     // 이메일 찾기 메소드
-    @Transactional(readOnly = true)
     public EncryptEmailDto findUserEmail(FindEmailDto findEmailDto) {
         String userName = findEmailDto.getUserName();
         String phoneNumber = findEmailDto.getPhoneNumber();
@@ -204,7 +198,6 @@ public class MemberService {
 
     // TODO 마이페이지 조회 메소드 필요할 것 같음 추가예정 - 조회할떄 각 정보 DTO로 감싸서 리턴하게 해야함, 각 도메인 별로 조회용 DTO 생성되면 구현 예정
     // QUERYDSL 적용해야함
-    @Transactional(readOnly = true)
     public Page<GetUserPost> getUserPostDto(Long memberId, Pageable pageable) {
         List<GetUserPost> collect = postRepository.getUserPostById(memberId, pageable).stream().map(GetUserPost::new).collect(Collectors.toList());
         return new PageImpl<>(collect);
@@ -212,16 +205,12 @@ public class MemberService {
 
     }
 
-    // TODO 아직 미구현
-    @Transactional(readOnly = true)
     public Page<GetUserMessageRoom> getUserMessageRoom(Long memberId, Pageable pageable) {
         return messageRoomCustomRepositoryImpl.findUserMessageRoom(memberId, pageable);
 
     }
 
     // 멤버 주소 리스트 조회
-    // TODO QueryDSL로 리팩터링 해야된다
-    @Transactional(readOnly = true)
     public GetMemberAddressesDTO getMemberAddressesDTO(Long memberId) {
         List<AddressInfoDTO> userAddress = memberCustomRepositoryImpl.getUserAddress(memberId);
 
@@ -229,12 +218,10 @@ public class MemberService {
     }
 
     // 멤버 디테일 조회
-    @Transactional(readOnly = true)
     public UserDetail getUserDetail(Long memberId) {
         return memberCustomRepositoryImpl.getUserDetail(memberId);
     }
 
-    @Transactional(readOnly = true)
     public GetOtherUserInfoDto getOtherUserById(Long memberId) {
         return memberCustomRepositoryImpl.getOtherUserInfo(memberId);
     }

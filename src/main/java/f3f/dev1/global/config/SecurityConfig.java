@@ -6,6 +6,7 @@ import f3f.dev1.global.jwt.JwtAccessDeniedHandler;
 import f3f.dev1.global.jwt.JwtAuthenticationEntryPoint;
 import f3f.dev1.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,14 +25,14 @@ import java.util.Arrays;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final JwtTokenProvider jwtTokenProvider;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-
+    @Value("${origins.local}")
+    private String local;
     private final ObjectMapper mapper;
+    private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
-
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
 
     @Bean
@@ -95,7 +96,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000","https://main.d8tw528p0jeqh.amplifyapp.com/"));
+//        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000","https://main.d8tw528p0jeqh.amplifyapp.com/"));
+        configuration.setAllowedOrigins(Arrays.asList(local));
         configuration.setAllowedMethods(Arrays.asList("HEAD", "POST", "GET", "DELETE", "PUT", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
