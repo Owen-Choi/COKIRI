@@ -7,7 +7,6 @@ public class JwtConstants {
     //accessToken 만료 임시 테스트
 //    public static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 10;           // 10초
     public static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;           // 30분
-
     public static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24;  // 하루
 //    public static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 20;  // 20초
     public static final String AUTHORIZATION_HEADER = "Authorization";
