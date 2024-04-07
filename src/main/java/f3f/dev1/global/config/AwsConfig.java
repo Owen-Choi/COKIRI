@@ -11,11 +11,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AwsConfig {
 
-    private final String region = "ap-northeast-2";
+    @Value("${cloud.aws.region.static}")
+    private String region = "ap-northeast-2";
+
+    @Value("${cloud.aws.credentials.accessKey}")
+    private String accessKey;
+
+    @Value("${cloud.aws.credentials.secretKey}")
+    private String secretKey;
 
     @Bean
-    public AmazonS3Client amazonS3Client(@Value("${aws.iam.access}") String iamAccessKey, @Value("${aws.iam.secret}") String iamSecretKey) {
-        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(iamAccessKey, iamSecretKey);
+    public AmazonS3Client amazonS3Client() {
+        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);
         return (AmazonS3Client) AmazonS3ClientBuilder
                 .standard()
                 .withRegion(region)
