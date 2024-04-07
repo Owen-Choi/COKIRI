@@ -9,6 +9,7 @@ import f3f.dev1.domain.member.application.EmailCertificationService;
 import f3f.dev1.domain.member.application.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,13 +38,14 @@ public class MemberAuthController {
     private final AuthService authService;
 
     private final AmazonS3Client amazonS3Client;
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     // 이미지 유저 프로필 사진 업로드
     // TODO authController에 있을 이유가 없다. memberController로 이동 예정
     @PostMapping(value = "/auth/image/profileImage")
     public ResponseEntity<ImageUrlDto> profileUpload(MultipartFile[] imageFiles) throws IOException {
         List<String> imagePathList = new ArrayList<>();
-        String S3Bucket = "cokiri-image/image/profileImage";
         for (MultipartFile multipartFile : imageFiles) {
             String originalName = multipartFile.getOriginalFilename(); // 파일 이름
             long size = multipartFile.getSize(); // 파일 크기
@@ -55,13 +57,13 @@ public class MemberAuthController {
             // S3에 업로드
             amazonS3Client.putObject(
                     new PutObjectRequest(
-                            S3Bucket,
+                            bucket,
                             originalName, multipartFile.getInputStream(),
                             objectMetaData
                     ).withCannedAcl(CannedAccessControlList.PublicRead)
             );
 
-            String imagePath = amazonS3Client.getUrl(S3Bucket, originalName).toString(); // 접근가능한 URL 가져오기
+            String imagePath = amazonS3Client.getUrl(bucket, originalName).toString(); // 접근가능한 URL 가져오기
             imagePathList.add(imagePath);
         }
 
@@ -73,7 +75,7 @@ public class MemberAuthController {
     @PostMapping(value = "/auth/image/postImage")
     public ResponseEntity<ImageUrlDto> postUpload(MultipartFile[] imageFiles) throws IOException {
         List<String> imagePathList = new ArrayList<>();
-        String S3Bucket = "cokiri-image/image/postImage";
+//        String S3Bucket = "cokiri-image/image/postImage";
         for (MultipartFile multipartFile : imageFiles) {
             String originalName = multipartFile.getOriginalFilename(); // 파일 이름
             long size = multipartFile.getSize(); // 파일 크기
@@ -85,13 +87,13 @@ public class MemberAuthController {
             // S3에 업로드
             amazonS3Client.putObject(
                     new PutObjectRequest(
-                            S3Bucket,
+                            bucket,
                             originalName, multipartFile.getInputStream(),
                             objectMetaData
                     ).withCannedAcl(CannedAccessControlList.PublicRead)
             );
 
-            String imagePath = amazonS3Client.getUrl(S3Bucket, originalName).toString(); // 접근가능한 URL 가져오기
+            String imagePath = amazonS3Client.getUrl(bucket, originalName).toString(); // 접근가능한 URL 가져오기
             imagePathList.add(imagePath);
         }
 

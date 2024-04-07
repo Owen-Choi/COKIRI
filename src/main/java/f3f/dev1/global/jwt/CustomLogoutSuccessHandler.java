@@ -1,16 +1,11 @@
 package f3f.dev1.global.jwt;
 
-import f3f.dev1.domain.member.exception.UserNotFoundByEmailException;
-import f3f.dev1.domain.member.exception.UserNotFoundException;
-import f3f.dev1.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.authentication.AbstractAuthenticationTargetUrlRequestHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -34,7 +29,8 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler im
         log.info("로그아웃 호출됐음");
         log.info(response.getHeader("Access-Control-Allow-Origin"));
         log.info(request.getHeader("Access-Control-Allow-Origin"));
-        setDefaultTargetUrl("https://f3f-cokiri.site/logout-redirect");
+//        setDefaultTargetUrl("https://f3f-cokiri.site/logout-redirect");
+        setDefaultTargetUrl("http://localhost:8080/logout-redirect");
         // 여기 response에 cors 관련 헤더 허용해준다는 거 넣으면 될듯? 그리고 여기서도 그 값 제거해줄 수 있을 것 같은데
 
         String token = request.getHeader("Authorization").split(" ")[1];
@@ -44,10 +40,11 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler im
 
 
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        if (valueOperations.get(principal.getUsername()) == null) {
-            throw new UserNotFoundException();
+        if (valueOperations.get(principal.getUsername()) != null) {
+            // 로그아웃인데 refreshToken을 봐야할 필요가 있나?
+//            throw new UserNotFoundException();
+            valueOperations.getAndDelete(principal.getUsername());
         }
-        valueOperations.getAndDelete(principal.getUsername());
 
         log.info(request.getRequestURI());
         super.onLogoutSuccess(request, response, authentication);
