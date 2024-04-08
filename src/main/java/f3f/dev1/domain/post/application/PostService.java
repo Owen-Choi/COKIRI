@@ -86,7 +86,6 @@ public class PostService {
         memberRepository.findById(currentMemberId).orElseThrow(NotFoundByIdException::new);
 
         Post post = postSaveRequest.toEntity(member, productCategory, wishCategory, resultsList);
-//        member.getPosts().add(post);
         postRepository.save(post);
 
         Trade trade = CreateTradeDto.builder().sellerId(member.getId()).postId(post.getId()).build().toEntity(member, post);

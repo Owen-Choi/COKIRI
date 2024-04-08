@@ -414,22 +414,20 @@ public class MemberDTO {
   @Data
   @Builder
   @NoArgsConstructor
-  @AllArgsConstructor
+//  @AllArgsConstructor
   public static class GetUserPost {
     private Long postId;
     private String thumbNail;
     private String title;
-    private String tradeStatus;
+    private TradeStatus tradeStatus;
     private String wishCategory;
     private Long likeCount;
 
-    public GetUserPost(Long postId, String thumbNail, String title, Trade trade, String wishCategory, Long likeCount) {
+    public GetUserPost(Long postId, String thumbNail, String title, TradeStatus tradeStatus, String wishCategory, Long likeCount) {
       this.postId = postId;
       this.thumbNail = thumbNail;
       this.title = title;
-      this.tradeStatus = trade != null && trade.getTradeStatus().name().equals("0") ?
-          TradeStatus.TRADABLE.name() : trade != null && trade.getTradeStatus().name().equals("1") ?
-          TradeStatus.TRADING.name() : TradeStatus.TRADED.name();
+      this.tradeStatus = tradeStatus;
       this.wishCategory = wishCategory;
       this.likeCount = likeCount;
     }
