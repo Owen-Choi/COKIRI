@@ -28,6 +28,13 @@ public class PostController {
     private final PostService postService;
 
 
+    // 내 게시글 조회
+    @GetMapping("/user/posts")
+    public ResponseEntity<Page<GetUserPost>> getUserPosts(Pageable pageable) {
+        Long currentMemberId = SecurityUtil.getCurrentMemberId();
+        return ResponseEntity.ok(postService.getUserPostDto(currentMemberId, pageable));
+    }
+
     // 게시글 전체 조회 세분화 - 태그 제외 조건들 검색
     @GetMapping(value = "/post")
     public ResponseEntity<Page<PostSearchResponseDto>> getPostsWithConditionExcludeTags(
@@ -70,6 +77,7 @@ public class PostController {
         return new ResponseEntity<>(resultList, HttpStatus.OK);
     }
 
+    // 다른 사용자의 게시글을 열람할 때 사용되는데, 뭔가 구조가 이상하다.
     @GetMapping(value = "/post/user/{memberId}")
     public ResponseEntity<Page<GetUserPost>> getUserPostById(@PathVariable(name = "memberId") Long memberId, Pageable pageable) {
         return ResponseEntity.ok(postService.findPostByAuthorId(memberId, pageable));

@@ -196,15 +196,6 @@ public class MemberService {
     }
 
 
-    // TODO 마이페이지 조회 메소드 필요할 것 같음 추가예정 - 조회할떄 각 정보 DTO로 감싸서 리턴하게 해야함, 각 도메인 별로 조회용 DTO 생성되면 구현 예정
-    // QUERYDSL 적용해야함
-    public Page<GetUserPost> getUserPostDto(Long memberId, Pageable pageable) {
-        List<GetUserPost> collect = postRepository.getUserPostById(memberId, pageable).stream().map(GetUserPost::new).collect(Collectors.toList());
-        return new PageImpl<>(collect);
-
-
-    }
-
     public Page<GetUserMessageRoom> getUserMessageRoom(Long memberId, Pageable pageable) {
         return messageRoomCustomRepositoryImpl.findUserMessageRoom(memberId, pageable);
 

@@ -102,6 +102,11 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    public Page<GetUserPost> getUserPostDto(Long memberId, Pageable pageable) {
+        return postRepository.getUserPostById(memberId, pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Page<PostSearchResponseDto> findOnlyWithTradeStatus (Long currentMemberId, TradeStatus tradeStatus, Pageable pageable) {
         Page<Post> all = postCustomRepository.findPostsWithTradeStatus(tradeStatus, pageable);
         List<PostSearchResponseDto> resultList = new ArrayList<>();
@@ -124,9 +129,10 @@ public class PostService {
     @Transactional(readOnly = true)
     public Page<GetUserPost> findPostByAuthorId(Long authorId, Pageable pageable) {
 //        List<GetUserPost> collect = postRepository.getUserPostById(authorId, pageable).stream().map(GetUserPost::new).collect(Collectors.toList());
-        Page<PostRepository.GetUserPostInterface> userPostById = postRepository.getUserPostById(authorId, pageable);
-        List<GetUserPost> collect = userPostById.stream().map(GetUserPost::new).collect(Collectors.toList());
-        return new PageImpl<>(collect, pageable, userPostById.getTotalElements());
+//        Page<PostRepository.GetUserPostInterface> userPostById = postRepository.getUserPostById(authorId, pageable);
+//        List<GetUserPost> collect = userPostById.stream().map(GetUserPost::new).collect(Collectors.toList());
+//        return new PageImpl<>(collect, pageable, userPostById.getTotalElements());
+        return postRepository.getUserPostById(authorId, pageable);
     }
 
     // TODO 고려해야할 것 : 캐싱 동기화(sync), 비회면 조건부 캐싱
