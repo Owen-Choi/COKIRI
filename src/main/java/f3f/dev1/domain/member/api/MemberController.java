@@ -93,14 +93,6 @@ public class MemberController {
     // 유저 주소 업데이트 --> AddressController로 변경
 
 
-    // 마이페이지용 조회 - 유저가 작성한 게시글 리스트 리턴
-    @GetMapping("/user/posts")
-    public ResponseEntity<Page<GetUserPost>> getUserPosts(Pageable pageable) {
-        Long currentMemberId = SecurityUtil.getCurrentMemberId();
-        return ResponseEntity.ok(memberService.getUserPostDto(currentMemberId, pageable));
-    }
-
-
     // 유저가 속한 채팅방 리스트 리턴
     @GetMapping("/user/messageRooms")
     public ResponseEntity<Page<GetUserMessageRoom>> getUserMessageRooms(Pageable pageable) {
