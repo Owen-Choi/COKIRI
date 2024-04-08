@@ -2,7 +2,6 @@ package f3f.dev1.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import f3f.dev1.domain.address.model.Address;
-import f3f.dev1.domain.comment.dto.CommentDTO;
 import f3f.dev1.domain.member.dto.MemberDTO;
 import f3f.dev1.domain.member.model.Member;
 import f3f.dev1.domain.model.TradeStatus;
@@ -273,7 +272,7 @@ public class PostControllerTest {
                 .likeCount(3L)
                 .postId(1L)
                 .thumbNail("")
-                .tradeStatus(String.valueOf(TradeStatus.TRADABLE))
+                .tradeStatus(TradeStatus.TRADABLE)
                 .wishCategory("테스트용 위시 카테고리")
                 .title("테스트용 게시글 제목")
                 .build();
