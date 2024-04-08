@@ -55,13 +55,12 @@ public class ScrapPostRepositoryImpl implements ScrapPostCustomRepository {
                 post.id,
                 post.title,
                 post.thumbnailImgPath,
-                post.trade,
+                post.trade.tradeStatus,
                 category.name,
                 scrapPost.scrap.count()
             )
         ).from(scrapPost)
         .join(scrapPost.post, post).on(scrapPost.post.id.eq(post.id))
-//                .join(post.trade, trade).on(trade.post.id.eq(scrapPost.post.id))
         .join(post.wishCategory, category).on(post.wishCategory.id.eq(category.id))
         .where(scrapPost.post.id.in(
             JPAExpressions

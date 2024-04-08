@@ -140,7 +140,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
                 post.id,
                 post.thumbnailImgPath,
                 post.title,
-                post.trade,
+                post.trade.tradeStatus,
                 post.wishCategory.name,
                 scrapPost.id.count()
             ))

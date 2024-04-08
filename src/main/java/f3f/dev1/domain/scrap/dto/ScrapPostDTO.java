@@ -14,7 +14,6 @@ public class ScrapPostDTO {
     @Data
     @Builder
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class GetUserScrapPost{
         private Long postId;
         private String thumbNail;
@@ -23,13 +22,11 @@ public class ScrapPostDTO {
         private String wishCategory;
         private Long scrapCount;
 
-        public GetUserScrapPost(Long postId, String title, String thumbNail, Trade trade, String wishCategory, Long likeCount) {
+        public GetUserScrapPost(Long postId, String title, String thumbNail, TradeStatus tradeStatus, String wishCategory, Long likeCount) {
             this.postId = postId;
             this.title = title;
             this.thumbNail = thumbNail;
-            this.tradeStatus = trade != null && trade.getTradeStatus().name().equals("0") ?
-                TradeStatus.TRADABLE : trade != null && trade.getTradeStatus().name().equals("1") ?
-                TradeStatus.TRADING : TradeStatus.TRADED;
+            this.tradeStatus = tradeStatus;
             this.wishCategory = wishCategory;
             this.scrapCount = likeCount;
         }
