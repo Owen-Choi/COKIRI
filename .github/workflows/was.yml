@@ -56,8 +56,8 @@ jobs:
           key: ${{ secrets.WAS_PEM_KEY }}
           port: 22
           script: |
-            sudo docker kill ${{ secrets.WAS_DOCKER_USERNAME }}
+            sudo docker kill ${{ secrets.WAS_DOCKER_REPO }}
             sudo docker container prune -f
             sudo docker pull ${{ secrets.WAS_DOCKER_USERNAME }}/${{ secrets.WAS_DOCKER_REPO }}
-            sudo docker run -d -p 8080:8080 --name ${{ secrets.WAS_DOCKER_USERNAME }} ${{ secrets.WAS_DOCKER_USERNAME }}/${{ secrets.WAS_DOCKER_REPO }}
+            sudo docker run -d -p 8080:8080 --name ${{ secrets.WAS_DOCKER_REPO }} ${{ secrets.WAS_DOCKER_USERNAME }}/${{ secrets.WAS_DOCKER_REPO }}
             sudo docker image prune -f
