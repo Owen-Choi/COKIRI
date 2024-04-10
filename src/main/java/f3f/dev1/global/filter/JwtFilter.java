@@ -33,8 +33,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final ObjectMapper mapper;
 
-    @Value("${origins.local}")
-    private String local;
+//    @Value("${origins.local}")
+//    private String local;
+
+    @Value("${origins.ws_host}")
+    private String ws_host;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -70,7 +73,7 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setCharacterEncoding("utf-8");
             response.setStatus(response.SC_UNAUTHORIZED);
 //            response.setHeader("Access-Control-Allow-Origin", "https://main.d8tw528p0jeqh.amplifyapp.com");
-            response.setHeader("Access-Control-Allow-Origin", local);
+            response.setHeader("Access-Control-Allow-Origin", ws_host);
             try {
                 response.getWriter().write(result);
             } catch (IOException exception) {
@@ -86,7 +89,7 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setCharacterEncoding("utf-8");
             response.setStatus(response.SC_INTERNAL_SERVER_ERROR);
 //            response.setHeader("Access-Control-Allow-Origin", "https://main.d8tw528p0jeqh.amplifyapp.com");
-            response.setHeader("Access-Control-Allow-Origin", local);
+            response.setHeader("Access-Control-Allow-Origin", ws_host);
             try {
                 response.getWriter().write(result);
             } catch (IOException exception) {

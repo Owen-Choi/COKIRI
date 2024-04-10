@@ -25,8 +25,10 @@ import java.util.Arrays;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    @Value("${origins.local}")
-    private String local;
+//    @Value("${origins.local}")
+//    private String local;
+    @Value("${origins.ws_host}")
+    private String ws_host;
     private final ObjectMapper mapper;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
@@ -97,7 +99,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
 //        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000","https://main.d8tw528p0jeqh.amplifyapp.com/"));
-        configuration.setAllowedOrigins(Arrays.asList(local));
+        configuration.setAllowedOrigins(Arrays.asList(ws_host));
         configuration.setAllowedMethods(Arrays.asList("HEAD", "POST", "GET", "DELETE", "PUT", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
