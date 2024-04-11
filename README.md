@@ -14,11 +14,7 @@
 
 ### 배포 주소
 
-> 프론트 서버 : https://main.d8tw528p0jeqh.amplifyapp.com
-
-> 백엔드 서버 : https://f3f-cokiri.site
-
-> Api 문서 링크 : https://f3f-cokiri.site/api-guide
+> https://www.file-blocker.shop
 
 ### 화면 구성
 
