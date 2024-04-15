@@ -138,7 +138,7 @@ public class PostService {
     // TODO 쿼리DSL에서 Enum 클래스의 세부 필드를 where절에서 비교할 수 없다. 따라서 서비스 로직 (자바코드) 단에서 직접 거래 가능 여부를 체크해줘야 할 것 같다.
     // + 캐시 만료, 삭제 시점
     // pageable 관련 key값은 현재 페이지 수만 추가해뒀다. 각 페이지마다 보여주는 데이터의 수가 같아야만 한다.
-    @Cacheable(value = POST_LIST_WITHOUT_TAG, key = "#request.productCategory + '_' + #request.wishCategory + '_' + #request.minPrice + '_' + #request.maxPrice + '_' + 'p' + #pageable.getPageNumber()")
+//    @Cacheable(value = POST_LIST_WITHOUT_TAG, key = "#request.productCategory + '_' + #request.wishCategory + '_' + #request.minPrice + '_' + #request.maxPrice + '_' + 'p' + #pageable.getPageNumber()")
     @Transactional(readOnly = true)
     public Page<PostSearchResponseDto> findPostsByCategoryAndPriceRange(SearchPostRequestExcludeTag request, Long currentMemberId, Pageable pageable) {
         List<PostSearchResponseDto> list = new ArrayList<>();
