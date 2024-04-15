@@ -26,9 +26,6 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler im
     @Override
     @Transactional
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        log.info("로그아웃 호출됐음");
-        log.info(response.getHeader("Access-Control-Allow-Origin"));
-        log.info(request.getHeader("Access-Control-Allow-Origin"));
 //        setDefaultTargetUrl("https://f3f-cokiri.site/logout-redirect");
         setDefaultTargetUrl("http://localhost:8080/logout-redirect");
         // 여기 response에 cors 관련 헤더 허용해준다는 거 넣으면 될듯? 그리고 여기서도 그 값 제거해줄 수 있을 것 같은데
@@ -46,7 +43,6 @@ public class CustomLogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler im
             valueOperations.getAndDelete(principal.getUsername());
         }
 
-        log.info(request.getRequestURI());
         super.onLogoutSuccess(request, response, authentication);
     }
 

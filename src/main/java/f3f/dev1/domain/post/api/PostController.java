@@ -56,7 +56,7 @@ public class PostController {
                     .build();
         Page<PostSearchResponseDto> pageDto = postService.findPostsByCategoryAndPriceRange(request, currentMemberId, pageable);
         long afterTime = System.currentTimeMillis();
-        log.error(String.valueOf(afterTime - beforeTime));
+        log.info(String.valueOf(afterTime - beforeTime));
             return new ResponseEntity<>(pageDto, HttpStatus.OK);
     }
 
