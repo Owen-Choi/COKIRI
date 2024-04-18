@@ -61,6 +61,13 @@ public class PostController {
     }
 
 
+    /**
+     * 태그를 포함해서 검색하는 api와 포함하지 않고 검색하는 api를 분리하는 이유는 프론트 측에서 아예 이 둘이 별도의 기능으로 제공되기 때문이다.
+     * @param tagNames
+     * @param trade
+     * @param pageable
+     * @return
+     */
     @GetMapping(value = "/post/tagSearch")
     public ResponseEntity<Page<PostSearchResponseDto>> getPostsWithTagNames(
             @RequestParam(value = "tags", required = false, defaultValue = "") List<String> tagNames,

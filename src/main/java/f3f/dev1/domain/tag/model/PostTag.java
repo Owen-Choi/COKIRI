@@ -12,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class PostTag {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "postTag_id")
     private Long id;
 

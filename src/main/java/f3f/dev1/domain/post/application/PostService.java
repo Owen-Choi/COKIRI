@@ -23,7 +23,9 @@ import f3f.dev1.domain.scrap.dao.ScrapPostRepository;
 import f3f.dev1.domain.tag.application.PostTagService;
 import f3f.dev1.domain.tag.application.TagService;
 import f3f.dev1.domain.tag.dao.PostTagRepository;
+import f3f.dev1.domain.tag.dao.TagRepository;
 import f3f.dev1.domain.tag.model.PostTag;
+import f3f.dev1.domain.tag.model.Tag;
 import f3f.dev1.domain.trade.dao.TradeRepository;
 import f3f.dev1.domain.trade.model.Trade;
 import f3f.dev1.global.error.exception.NotFoundByIdException;
@@ -64,14 +66,12 @@ public class PostService {
     private final ScrapPostRepository scrapPostRepository;
     private final CategoryRepository categoryRepository;
     private final PostTagRepository postTagRepository;
+    private final TagRepository tagRepository;
 
     private final TagService tagService;
     private final PostImageService postImageService;
     private final PostTagService postTagService;
 
-    // Custom repository
-    private final PostCustomRepositoryImpl postCustomRepository;
-    private final MemberCustomRepositoryImpl memberCustomRepository;
 
     private final AmazonS3Client amazonS3Client;
 
@@ -86,12 +86,12 @@ public class PostService {
         memberRepository.findById(currentMemberId).orElseThrow(NotFoundByIdException::new);
 
         Post post = postSaveRequest.toEntity(member, productCategory, wishCategory, resultsList);
-        postRepository.save(post);
+        Post save = postRepository.save(post);
 
         Trade trade = CreateTradeDto.builder().sellerId(member.getId()).postId(post.getId()).build().toEntity(member, post);
         tradeRepository.save(trade);
 
-        tagService.addTagsToPost(post.getId(), postSaveRequest.getTagNames());
+        tagService.addTagsToPost(save.getId(), postSaveRequest.getTagNames());
 
         if(postSaveRequest.getImages() != null) {
             List<String> images = postSaveRequest.getImages();
@@ -107,7 +107,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Page<PostSearchResponseDto> findOnlyWithTradeStatus (Long currentMemberId, TradeStatus tradeStatus, Pageable pageable) {
-        Page<Post> all = postCustomRepository.findPostsWithTradeStatus(tradeStatus, pageable);
+        Page<Post> all = postRepository.findPostsWithTradeStatus(tradeStatus, pageable);
         List<PostSearchResponseDto> resultList = new ArrayList<>();
         if(currentMemberId != null) {
             Member member = memberRepository.findById(currentMemberId).orElseThrow(NotFoundByIdException::new);
@@ -138,11 +138,11 @@ public class PostService {
     // TODO 쿼리DSL에서 Enum 클래스의 세부 필드를 where절에서 비교할 수 없다. 따라서 서비스 로직 (자바코드) 단에서 직접 거래 가능 여부를 체크해줘야 할 것 같다.
     // + 캐시 만료, 삭제 시점
     // pageable 관련 key값은 현재 페이지 수만 추가해뒀다. 각 페이지마다 보여주는 데이터의 수가 같아야만 한다.
-//    @Cacheable(value = POST_LIST_WITHOUT_TAG, key = "#request.productCategory + '_' + #request.wishCategory + '_' + #request.minPrice + '_' + #request.maxPrice + '_' + 'p' + #pageable.getPageNumber()")
+    @Cacheable(value = POST_LIST_WITHOUT_TAG, key = "#request.productCategory + '_' + #request.wishCategory + '_' + #request.minPrice + '_' + #request.maxPrice + '_' + 'p' + #pageable.getPageNumber()")
     @Transactional(readOnly = true)
     public Page<PostSearchResponseDto> findPostsByCategoryAndPriceRange(SearchPostRequestExcludeTag request, Long currentMemberId, Pageable pageable) {
         List<PostSearchResponseDto> list = new ArrayList<>();
-        Page<Post> dtoPages = postCustomRepository.findPostDTOByConditions(request, pageable);
+        Page<Post> dtoPages = postRepository.findPostDTOByConditions(request, pageable);
         // 조회하는 사용자가 로그인된 회원인 경우
         if(currentMemberId != null) {
             Member member = memberRepository.findById(currentMemberId).orElseThrow(NotFoundByIdException::new);
@@ -171,7 +171,7 @@ public class PostService {
     @Cacheable(value = POST_LIST_WITH_TAG, keyGenerator = "customKeyGenerator")
     @Transactional(readOnly = true)
     public Page<PostSearchResponseDto> findPostsWithTagNameList(List<String> tagNames, Long currentMemberId, TradeStatus tradeStatus, Pageable pageable) {
-        Page<Post> dtoList = postCustomRepository.findPostsByTags(tagNames, tradeStatus, pageable);
+        Page<Post> dtoList = postRepository.findPostsByTags(tagNames, tradeStatus, pageable);
         List<PostSearchResponseDto> resultList = new ArrayList<>();
         if(currentMemberId != null) {
             Member member = memberRepository.findById(currentMemberId).orElseThrow(NotFoundByIdException::new);
@@ -205,7 +205,7 @@ public class PostService {
             commentInfoDtoList.add(comment.toInfoDto());
         }
 
-        UserInfoWithAddress userInfo = memberCustomRepository.getUserInfo(post.getAuthor().getId());
+        UserInfoWithAddress userInfo = memberRepository.getUserInfo(post.getAuthor().getId());
         List<String> postImages = new ArrayList<>();
         for (PostImage postImage : post.getPostImages()) {
             postImages.add(postImage.getImgPath());
@@ -260,6 +260,7 @@ public class PostService {
 
             이렇게 여러번 쿼리를 별도로 날리는 것 보다 한번에 일괄로 처리하는게 나으려나?
          */
+        // TODO 리팩토링 시급함
 
         if(updatePostRequest.getTitle() != null && !post.getTitle().equals(updatePostRequest.getTitle())) {
             post.updateTitle(updatePostRequest.getTitle());
