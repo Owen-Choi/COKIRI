@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PostTagRepository extends JpaRepository<PostTag, Long> {
+public interface PostTagRepository extends JpaRepository<PostTag, Long>, PostTagCustomRepository {
 
     Optional<PostTag> findById(Long id);
     List<PostTag> findByTagName(String name);
