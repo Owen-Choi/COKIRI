@@ -10,13 +10,11 @@ import f3f.dev1.domain.post.model.ScrapPost;
 import f3f.dev1.domain.tag.dao.PostTagRepository;
 import f3f.dev1.domain.tag.dao.TagRepository;
 import f3f.dev1.domain.tag.exception.DuplicateTagException;
-import f3f.dev1.domain.tag.exception.NotFoundByTagNameException;
 import f3f.dev1.domain.tag.model.PostTag;
 import f3f.dev1.domain.tag.model.Tag;
 import f3f.dev1.global.error.exception.NotFoundByIdException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -74,39 +72,13 @@ public class TagService {
         return postTag.getId();
     }
 
-//    @Transactional
-//    public Long addTagsToPost(Long postId, List<String> tagNames) {
-//        Post post = postRepository.findById(postId).orElseThrow(NotFoundByIdException::new);
-//        // 전체를 bulk native query로 변경하겠다.
-//        // 전달 받은 tagNames에서 데이터베이스에 존재하지 않는 태그명만 골라 태그에 삽입.
-//        // 이후에 전체를 postTag에 넣어준다.
-//        // 그럼 게시글 수정에는?
-//        if(!tagNames.isEmpty()){
-//            for (String tagName : tagNames) {
-//                if(!tagRepository.existsByName(tagName)) {
-//                    // 게시글에서 받아온 태그가 현재 없는 태그면 자동으로 만들어 줘야 한다.
-//                    Tag tag = Tag.builder().name(tagName).build();
-//                    tagRepository.save(tag);
-//                    // 태그 저장 후 곧바로 postTag 만들어 추가해주기.
-//                    PostTag postTag = PostTag.builder().post(post).tag(tag).build();
-//                    postTagRepository.save(postTag);
-//                } else {
-//                    // 태그가 존재한다면 값을 받아와서 postTag로 만든 뒤 저장해준다.
-//                    Tag tag = tagRepository.findByName(tagName).orElseThrow(NotFoundByTagNameException::new);
-//                    PostTag postTag = PostTag.builder().post(post).tag(tag).build();
-//                    postTagRepository.save(postTag);
-//                }
-//            }
-//        }
-//        return post.getId();
-//    }
 
     @Transactional
     public void addTagsToPost(Long postId, List<String> tagNames) {
         Post post = postRepository.findById(postId).orElseThrow(NotFoundByIdException::new);
-        tagRepository.tagBulkInsert(tagNames);
+        tagRepository.saveTagWithBulk(tagNames);
         List<Long> tagsId = tagRepository.findByNameIn(tagNames).stream().map(tag -> tag.getId()).collect(Collectors.toList());
-        postTagRepository.postTagBulkInsert(post.getId(), tagsId);
+        postTagRepository.savePostTagWithBulk(post.getId(), tagsId);
     }
 
     /*

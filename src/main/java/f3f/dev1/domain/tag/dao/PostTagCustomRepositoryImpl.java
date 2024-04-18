@@ -13,11 +13,11 @@ public class PostTagCustomRepositoryImpl implements PostTagCustomRepository{
 
   private final JdbcTemplate jdbcTemplate;
   @Override
-  public void postTagBulkInsert(Long postId, List<Long> tagsId) {
+  public void savePostTagWithBulk(Long postId, List<Long> tagsId) {
     String sql = "INSERT INTO post_tag (post_id, tag_id)\n"
         + "SELECT (?), (?)\n"
         + "WHERE NOT EXISTS (\n"
-        +"    SELECT 2 FROM post_tag WHERE tag_id = ?);";
+        +"    SELECT 2 FROM post_tag WHERE tag_id = ?)";
 
     jdbcTemplate.batchUpdate(sql, tagsId, tagsId.size(), (PreparedStatement ps, Long tagId) -> {
       ps.setLong(1, postId);

@@ -10,13 +10,9 @@ import java.util.List;
 public class TagCustomRepositoryImpl implements TagCustomRepository{
 
   private final JdbcTemplate jdbcTemplate;
-
   @Override
-  public void tagBulkInsert(List<String> tagNames) {
-    String sql = "INSERT INTO tag (name)\n"
-        + "SELECT ? \n"
-        + "WHERE NOT EXISTS (\n"
-        + "   SELECT 1 FROM tag where name = ?);";
+  public void saveTagWithBulk(List<String> tagNames) {
+    String sql = "INSERT INTO tag (name) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM tag where name = ?)";
 
     jdbcTemplate.batchUpdate(sql, tagNames, tagNames.size(), (PreparedStatement ps, String tagName) -> {
       ps.setString(1, tagName);
