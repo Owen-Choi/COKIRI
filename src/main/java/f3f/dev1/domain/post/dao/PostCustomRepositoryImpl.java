@@ -4,11 +4,14 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import f3f.dev1.domain.member.dto.MemberDTO;
+import f3f.dev1.domain.message.model.QMessageRoom;
 import f3f.dev1.domain.model.TradeStatus;
+import f3f.dev1.domain.post.dto.PostDTO;
 import f3f.dev1.domain.post.model.Post;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +25,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.querydsl.core.util.StringUtils.isNullOrEmpty;
+import static f3f.dev1.domain.message.model.QMessageRoom.*;
+import static f3f.dev1.domain.post.dto.PostDTO.*;
 import static f3f.dev1.domain.post.dto.PostDTO.SearchPostRequestExcludeTag;
 import static f3f.dev1.domain.post.model.QPost.post;
 import static f3f.dev1.domain.post.model.QScrapPost.scrapPost;
 import static f3f.dev1.domain.scrap.model.QScrap.scrap;
 import static f3f.dev1.domain.tag.model.QPostTag.postTag;
+import static f3f.dev1.domain.tag.model.QTag.tag;
 import static f3f.dev1.domain.trade.model.QTrade.trade;
 
 @Slf4j
@@ -72,33 +78,53 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
 
 
     @Override
-    public Page<Post> findPostsByTags(List<String>tagNames, TradeStatus tradeStatus, Pageable pageable) {
-        List<Post> result = findPostsByTagsQuery(tagNames, tradeStatus, pageable);
+    public Page<PostSearchResponseDto> findPostsByTags(List<String>tagNames, TradeStatus tradeStatus, Pageable pageable) {
+        List<PostSearchResponseDto> result = findPostsByTagsQuery(tagNames, tradeStatus, pageable);
         // 카운트 쿼리
+        // 최적화할 수 있다. 카운트 쿼리에서는 스크랩 여부는 알 필요가 없으니 조인을 2번이나 줄일 수 있다.
         JPAQuery<Long> countQuery = jpaQueryFactory
-                .select(post.count())
-                .from(post)
-                .leftJoin(post.postTags, postTag).fetchJoin()
-                .where(postTag.tag.name.in(tagNames))
-                .where(post.trade.tradeStatus.eq(tradeStatus))
-                .groupBy(post.id)
-                .having(post.id.count().eq((long) tagNames.size()));
+            .select(post.count())
+            .from(post)
+            .join(post.trade, trade)
+            .join(post.postTags, postTag)
+            .join(postTag.tag, tag)
+            .where(tag.name.in(tagNames))
+            .where(trade.tradeStatus.eq(tradeStatus))
+            .groupBy(post.id);
         return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
     }
 
-    private List<Post> findPostsByTagsQuery(List<String> tagNames, TradeStatus tradeStatus, Pageable pageable) {
-        List<Post> results = jpaQueryFactory
-                .selectFrom(post)
-                .leftJoin(post.postTags, postTag).fetchJoin()
-                .where(postTag.tag.name.in(tagNames))
-                .where(post.trade.tradeStatus.eq(tradeStatus))
-                .groupBy(post.id)
-                .having(post.id.count().eq((long) tagNames.size()))
-                .orderBy(dynamicSorting(pageable.getSort()).toArray(OrderSpecifier[]::new))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-        return results;
+    private List<PostSearchResponseDto> findPostsByTagsQuery(List<String> tagNames, TradeStatus tradeStatus, Pageable pageable) {
+        return jpaQueryFactory
+            .select(Projections.constructor(PostSearchResponseDto.class,
+                post.id,
+                post.title,
+                post.content,
+                post.thumbnailImgPath,
+                post.author.nickname,
+                post.productCategory.name,
+                post.createDate,
+                messageRoom.id.count(),
+                post.wishCategory.name,
+                scrapPost.post.id.when(post.id)
+                    .then(true)
+                    .otherwise(false),
+                scrapPost.post.id.count(),
+                post.price
+                ))
+            .from(post)
+            .join(post.trade, trade)
+            .join(post.postTags, postTag)
+            .leftJoin(scrapPost).on(scrapPost.post.id.eq(post.id))
+            .leftJoin(messageRoom).on(messageRoom.post.id.eq(post.id))
+            .join(postTag.tag, tag)
+            .where(tag.name.in(tagNames))
+            .where(trade.tradeStatus.eq(tradeStatus))
+            .groupBy(post.id)
+            .orderBy(dynamicSorting(pageable.getSort()).toArray(OrderSpecifier[]::new))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
     }
 
     @Override
