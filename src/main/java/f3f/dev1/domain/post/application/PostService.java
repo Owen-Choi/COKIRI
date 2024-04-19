@@ -7,12 +7,10 @@ import f3f.dev1.domain.category.exception.NotFoundWishCategoryNameException;
 import f3f.dev1.domain.category.model.Category;
 import f3f.dev1.domain.comment.dao.CommentRepository;
 import f3f.dev1.domain.comment.model.Comment;
-import f3f.dev1.domain.member.dao.MemberCustomRepositoryImpl;
 import f3f.dev1.domain.member.dao.MemberRepository;
 import f3f.dev1.domain.member.exception.NotAuthorizedException;
 import f3f.dev1.domain.member.model.Member;
 import f3f.dev1.domain.model.TradeStatus;
-import f3f.dev1.domain.post.dao.PostCustomRepositoryImpl;
 import f3f.dev1.domain.post.dao.PostRepository;
 import f3f.dev1.domain.post.exception.NotContainAuthorInfoException;
 import f3f.dev1.domain.post.exception.NotMatchingAuthorException;
@@ -25,7 +23,6 @@ import f3f.dev1.domain.tag.application.TagService;
 import f3f.dev1.domain.tag.dao.PostTagRepository;
 import f3f.dev1.domain.tag.dao.TagRepository;
 import f3f.dev1.domain.tag.model.PostTag;
-import f3f.dev1.domain.tag.model.Tag;
 import f3f.dev1.domain.trade.dao.TradeRepository;
 import f3f.dev1.domain.trade.model.Trade;
 import f3f.dev1.global.error.exception.NotFoundByIdException;
@@ -43,7 +40,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static f3f.dev1.domain.comment.dto.CommentDTO.CommentInfoDto;
 import static f3f.dev1.domain.member.dto.MemberDTO.GetUserPost;
@@ -88,7 +84,7 @@ public class PostService {
         Post post = postSaveRequest.toEntity(member, productCategory, wishCategory, resultsList);
         Post save = postRepository.save(post);
 
-        Trade trade = CreateTradeDto.builder().sellerId(member.getId()).postId(post.getId()).build().toEntity(member, post);
+        Trade trade = CreateTradeDto.builder().sellerId(member.getId()).postId(save.getId()).build().toEntity(member, save);
         tradeRepository.save(trade);
 
         tagService.addTagsToPost(save.getId(), postSaveRequest.getTagNames());
@@ -171,22 +167,7 @@ public class PostService {
     @Cacheable(value = POST_LIST_WITH_TAG, keyGenerator = "customKeyGenerator")
     @Transactional(readOnly = true)
     public Page<PostSearchResponseDto> findPostsWithTagNameList(List<String> tagNames, Long currentMemberId, TradeStatus tradeStatus, Pageable pageable) {
-        Page<Post> dtoList = postRepository.findPostsByTags(tagNames, tradeStatus, pageable);
-        List<PostSearchResponseDto> resultList = new ArrayList<>();
-        if(currentMemberId != null) {
-            Member member = memberRepository.findById(currentMemberId).orElseThrow(NotFoundByIdException::new);
-            for (Post post : dtoList) {
-                boolean isScrap = scrapPostRepository.existsByScrapIdAndPostId(member.getScrap().getId(), post.getId());
-                PostSearchResponseDto build = post.toSearchResponseDto((long)post.getMessageRooms().size(), (long)post.getScrapPosts().size(), isScrap);
-                resultList.add(build);
-            }
-        } else {
-            for (Post post : dtoList) {
-                PostSearchResponseDto build = post.toSearchResponseDto((long)post.getMessageRooms().size(), (long)post.getScrapPosts().size(), false);
-                resultList.add(build);
-            }
-        }
-        return new PageImpl<>(resultList, pageable, dtoList.getTotalElements());
+        return postRepository.findPostsByTags(tagNames, tradeStatus, pageable);
     }
 
     @Transactional(readOnly = true)

@@ -12,6 +12,7 @@ import lombok.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static f3f.dev1.domain.comment.dto.CommentDTO.*;
@@ -180,9 +181,26 @@ public class PostDTO {
         private String createdTime;
         private Long messageRoomCount;
         private String wishCategory;
-        private boolean isScrap;
+        private Boolean isScrap;
         private Long scrapCount;
         private Long price;
+
+        public PostSearchResponseDto(Long id, String title, String content, String thumbnail, String authorNickname,
+                                     String productCategory, LocalDateTime createdTime, Long messageRoomCount,
+                                     String wishCategory, boolean isScrap, Long scrapCount, Long price) {
+            this.id = id;
+            this.title = title;
+            this.price = price;
+            this.content = content;
+            this.isScrap = isScrap;
+            this.thumbnail = thumbnail;
+            this.scrapCount = scrapCount;
+            this.wishCategory = wishCategory;
+            this.authorNickname = authorNickname;
+            this.productCategory = productCategory;
+            this.messageRoomCount = messageRoomCount;
+            this.createdTime = createdTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+        }
     }
 
     @Getter
