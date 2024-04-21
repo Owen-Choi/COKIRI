@@ -2,6 +2,8 @@ package f3f.dev1.domain.member.dao;
 
 import f3f.dev1.domain.member.model.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -22,4 +24,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberCus
     boolean existsByIdAndPassword(Long id, String password);
 
     boolean existsByNickname(String nickname);
+
+    @Query(value = "SELECT m FROM Member m JOIN FETCH m.scrap WHERE m.id = :memberId")
+    Optional<Member> findByIdWithFetch(@Param("memberId") Long memberId);
 }

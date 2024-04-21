@@ -172,20 +172,14 @@ public class Post extends BaseTimeEntity {
     }
 
     public PostInfoDtoWithTag toInfoDtoWithTag(List<String> tagNames, Long scrapCount, Long messageRoomCount) {
-        TradeStatus tradeStatus;
-        if (this.trade == null) {
-            tradeStatus = TradeStatus.TRADABLE;
-        } else {
-            tradeStatus = this.trade.getTradeStatus();
-        }
         return PostInfoDtoWithTag.builder()
+                .tradeStatus(this.trade == null ? TradeStatus.TRADABLE : this.trade.getTradeStatus())
                 .productCategory(this.productCategory.getName())
                 .authorNickname(this.author.getNickname())
                 .wishCategory(this.wishCategory.getName())
                 .tradeEachOther(this.tradeEachOther)
                 .createdTime(super.getCreateDate())
                 .messageRoomCount(messageRoomCount)
-                .tradeStatus(tradeStatus)
                 .scrapCount(scrapCount)
                 .content(this.content)
                 .tagNames(tagNames)
@@ -196,16 +190,10 @@ public class Post extends BaseTimeEntity {
     }
 
     public SinglePostInfoDto toSinglePostInfoDto(List<String> tagNames, Long scrapCount, Long messageRoomCount, UserInfoWithAddress userInfo, List<CommentInfoDto> commentInfoDtoList, List<String> images, boolean scrapExists) {
-        TradeStatus tradeStatus;
-        if (this.trade == null) {
-            tradeStatus = TradeStatus.TRADABLE;
-        } else {
-            tradeStatus = this.trade.getTradeStatus();
-        }
         return SinglePostInfoDto.builder()
+                .tradeStatus(this.trade == null ? TradeStatus.TRADABLE : this.trade.getTradeStatus())
                 .productCategory(this.productCategory.getName())
                 .wishCategory(this.wishCategory.getName())
-                .tradeStatus(tradeStatus)
                 .commentInfoDtoList(commentInfoDtoList)
                 .tradeEachOther(this.tradeEachOther)
                 .messageRoomCount(messageRoomCount)

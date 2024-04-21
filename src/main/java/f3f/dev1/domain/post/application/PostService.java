@@ -173,9 +173,8 @@ public class PostService {
     @Transactional(readOnly = true)
     public SinglePostInfoDto findPostById(Long id, Long currentMemberId) {
         Post post = postRepository.findById(id).orElseThrow(NotFoundByIdException::new);
-        // TODO 거래 가능 상태인지 확인하기
         List<String> tagNames = new ArrayList<>();
-        List<PostTag> postTags = postTagRepository.findByPost(post);
+        List<PostTag> postTags = postTagRepository.findByPostId(post.getId());
         for (PostTag postTag : postTags) {
             tagNames.add(postTag.getTag().getName());
         }
@@ -192,11 +191,8 @@ public class PostService {
             postImages.add(postImage.getImgPath());
         }
 
-        // 비회원일 경우 member를 조회하면 오류가 발생한다. 따라서 null 여부를 체크하고, 이에 따라 로직이 분기해야 한다.
         if(currentMemberId != null) {
-            Member member = memberRepository.findById(currentMemberId).orElseThrow(NotFoundByIdException::new);
-            // 프론트의 요청으로 로그인한 사용자가 조회한 게시글을 스크랩했을 경우 표시를 해줘야 한다.
-            // 하지만 사용자의 스크랩이 존재하지 않은 경우 (이론상 불가능한 경우지만) 이에 대한 예외도 처리 해주어야 한다.
+            Member member = memberRepository.findByIdWithFetch(currentMemberId).orElseThrow(NotFoundByIdException::new);
             if(member.getScrap() != null) {
                 boolean isScrap = scrapPostRepository.existsByScrapIdAndPostId(member.getScrap().getId(), id);
                 SinglePostInfoDto response = post.toSinglePostInfoDto(tagNames, (long) post.getScrapPosts().size(), (long) post.getMessageRooms().size(), userInfo, commentInfoDtoList, postImages, isScrap);
