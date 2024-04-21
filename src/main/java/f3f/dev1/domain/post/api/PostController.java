@@ -42,9 +42,8 @@ public class PostController {
             @RequestParam(value= "wishCategory", required = false, defaultValue = "") String wishCategoryName,
             @RequestParam(value = "minPrice", required = false, defaultValue = "") String minPrice,
             @RequestParam(value = "maxPrice", required = false, defaultValue = "") String maxPrice,
-            @RequestParam(value="trade", required = true, defaultValue = "1") long trade,
+            @RequestParam(value="trade", defaultValue = "1") long trade,
             Pageable pageable) {
-        long beforeTime = System.currentTimeMillis();
         Long currentMemberId = SecurityUtil.getCurrentNullableMemberId();
         TradeStatus tradeStatus = TradeStatus.findById(trade);
             SearchPostRequestExcludeTag request = SearchPostRequestExcludeTag.builder()
@@ -55,9 +54,7 @@ public class PostController {
                     .maxPrice(maxPrice)
                     .build();
         Page<PostSearchResponseDto> pageDto = postService.findPostsByCategoryAndPriceRange(request, currentMemberId, pageable);
-        long afterTime = System.currentTimeMillis();
-        log.info(String.valueOf(afterTime - beforeTime));
-            return new ResponseEntity<>(pageDto, HttpStatus.OK);
+        return new ResponseEntity<>(pageDto, HttpStatus.OK);
     }
 
 
