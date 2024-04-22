@@ -134,6 +134,7 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
         JPAQuery<Long> countQuery = jpaQueryFactory
                 .select(post.count())
                 .from(post)
+                .join(post.trade, trade).fetchJoin()
                 .where(post.trade.tradeStatus.eq(tradeStatus));
         return PageableExecutionUtils.getPage(results, pageable, countQuery::fetchOne);
     }
@@ -141,12 +142,12 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
     private List<Post> findPostsWithTradeStatusQuery(TradeStatus tradeStatus, Pageable pageable) {
         List<Post> results = jpaQueryFactory
                 .selectFrom(post)
-                .where(post.trade.tradeStatus.eq(tradeStatus))
+                .join(post.trade, trade).fetchJoin()
+                .where(trade.tradeStatus.eq(tradeStatus))
                 .orderBy(dynamicSorting(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-
         return results;
     }
 
