@@ -39,18 +39,6 @@ public class ScrapService {
     private final ScrapPostRepository scrapPostRepository;
     private final PostRepository postRepository;
 
-    // 스크랩 생성 메서드
-    @Transactional
-    public void createScrap(CreateScrapDTO createScrapDTO) {
-        if (scrapRepository.existsByMemberId(createScrapDTO.getUser().getId())) {
-            throw new DuplicateScrapByUserIdException();
-        }
-
-        Scrap scrap = createScrapDTO.toEntity();
-        scrapRepository.save(scrap);
-
-    }
-
     // 스크랩에 있는 포스트조회 메서드
     @Transactional(readOnly = true)
     public Page<GetUserScrapPost> getUserScrapPosts(Long memberId, Pageable pageable) {
