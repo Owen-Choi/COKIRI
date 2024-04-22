@@ -38,7 +38,6 @@ public class ScrapService {
     private final MemberRepository memberRepository;
     private final ScrapPostRepository scrapPostRepository;
     private final PostRepository postRepository;
-    private final ScrapPostRepositoryImpl scrapPostRepositoryImpl;
 
     // 스크랩 생성 메서드
     @Transactional
@@ -55,13 +54,8 @@ public class ScrapService {
     // 스크랩에 있는 포스트조회 메서드
     @Transactional(readOnly = true)
     public Page<GetUserScrapPost> getUserScrapPosts(Long memberId, Pageable pageable) {
-
-
         Scrap scrapByUserId = scrapRepository.findScrapByMemberId(memberId).orElseThrow(NotFoundByIdException::new);
-
-//        List<GetUserScrapPost> collect = scrapPostRepository.findUserScrapPostByNativeQuery(scrapByUserId.getId(), pageable).stream().map(GetUserScrapPost::new).collect(Collectors.toList());
-//        return new PageImpl<>(collect);
-        return scrapPostRepositoryImpl.findUserScrapPost(scrapByUserId.getId(), pageable);
+        return scrapPostRepository.findUserScrapPost(scrapByUserId.getId(), pageable);
     }
 
     // 스크랩에 관심 포스트 추가 메소드
@@ -71,7 +65,6 @@ public class ScrapService {
         if (!addScrapPostDTO.getUserId().equals(memberId)) {
             throw new NotAuthorizedException();
         }
-
 
         Scrap scrap = scrapRepository.findScrapByMemberId(addScrapPostDTO.getUserId()).orElseThrow(NotFoundByIdException::new);
         Post post = postRepository.findById(addScrapPostDTO.getPostId()).orElseThrow(NotFoundByIdException::new);
