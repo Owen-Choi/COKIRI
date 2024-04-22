@@ -27,7 +27,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-    private final CommentCustomRepositoryImpl commentCustomRepository;
 
     /*
         C : Create
@@ -69,7 +68,7 @@ public class CommentService {
         if(!postRepository.existsById(postId)) {
             throw new NotFoundByIdException("해당 Id의 게시글이 존재하지 않습니다.");
         }
-        List<CommentInfoDto> resultList = commentCustomRepository.findCommentDtoByPostId(postId);
+        List<CommentInfoDto> resultList = commentRepository.findCommentDtoByPostId(postId);
         return resultList;
     }
 

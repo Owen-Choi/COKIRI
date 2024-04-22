@@ -52,11 +52,11 @@ public class PostCustomRepositoryImpl implements PostCustomRepository {
     private List<Post> findPostListWithConditionWithoutTag(SearchPostRequestExcludeTag requestExcludeTag, Pageable pageable) {
         List<Post> results = jpaQueryFactory.
                 selectFrom(post)
+                .join(post.trade, trade).fetchJoin()
                 .where(productCategoryNameFilter(requestExcludeTag.getProductCategory()),
                         wishCategoryNameFilter(requestExcludeTag.getWishCategory()),
                         priceFilter(requestExcludeTag.getMinPrice(), requestExcludeTag.getMaxPrice()))
-                // TradeStatus를 비교하는 아래 조건은 필수 조건이기 때문에 BooleanExpression을 활용한 동적 쿼리로 짜지는 않겠다.
-                .where(post.trade.tradeStatus.eq(requestExcludeTag.getTradeStatus()))
+                .where(trade.tradeStatus.eq(requestExcludeTag.getTradeStatus()))
                 .orderBy(dynamicSorting(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
