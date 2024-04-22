@@ -3,6 +3,7 @@ package f3f.dev1.domain.tag.dao;
 import f3f.dev1.domain.post.model.Post;
 import f3f.dev1.domain.tag.model.PostTag;
 import f3f.dev1.domain.tag.model.Tag;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +22,7 @@ public interface PostTagRepository extends JpaRepository<PostTag, Long>, PostTag
     List<PostTag> findByTagId(Long tagId);
     boolean existsByPostAndTag(Post post, Tag tag);
     List<PostTag> findByPost(Post post);
+    List<PostTag> findByPostId(Long postId);
     void deleteByPost(Post post);
 
     @Modifying

@@ -60,8 +60,8 @@ public class ScrapPostRepositoryImpl implements ScrapPostCustomRepository {
                 scrapPost.scrap.count()
             )
         ).from(scrapPost)
-        .join(scrapPost.post, post).on(scrapPost.post.id.eq(post.id))
-        .join(post.wishCategory, category).on(post.wishCategory.id.eq(category.id))
+        .join(scrapPost.post, post)
+        .join(post.wishCategory, category)
         .where(scrapPost.post.id.in(
             JPAExpressions
                 .select(newScrapPost.post.id)
